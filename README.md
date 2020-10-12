@@ -22,3 +22,7 @@
 
 #### render
 用于把虚拟 DOM 挂载到真实节点上。
+
+#### 区分组件和原生DOM
+例如在处理<Welcome name="Sara" />时，createElement方法的第一个参数tag，实际上就是我们定义Welcome的方法：
+

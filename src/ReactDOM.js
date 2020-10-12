@@ -1,5 +1,8 @@
-export const ReactDOM = {
-    render
+import React from "./React";
+
+export default {
+    render,
+    renderComponent
 }
 
 /**
@@ -8,6 +11,10 @@ export const ReactDOM = {
  * @param container:真实节点
  */
 function render(vnode,container) {
+    
+    if ( vnode === undefined || vnode === null || typeof vnode === 'boolean' ) vnode = '';
+    
+    if ( typeof vnode === 'number' ) vnode = String( vnode );
 
     if(typeof vnode==='string'){
         const newNode=document.createTextNode(vnode)
@@ -15,6 +22,19 @@ function render(vnode,container) {
         return
     }
     
+    /**
+     * 处理组件
+     */
+    if ( typeof vnode.tag === 'function' ) {
+        
+        const component = React.createComponent( vnode.tag, vnode.attrs );
+        setComponentProps( component, vnode.attrs );
+        return component.base;
+    }
+    
+    /**
+     * 处理 DOM 节点
+     */
     const {tag:tagName}=vnode
     let realDom=document.createElement(tagName)
     
@@ -69,4 +89,35 @@ function setAttribute( dom, name, value ) {
             dom.removeAttribute( name );
         }
     }
+}
+
+/**
+ * base:有说明是刚 mounted,否则说明之前 updated 过
+ * @param component:Component 实例
+ */
+function renderComponent( component ) {
+    
+    let base;
+    
+    const renderer = component.render();
+    
+    if (component.base && component.componentWillUpdate ) {
+        component.componentWillUpdate();
+    }
+    
+    base = _render( renderer );
+    
+    if ( component.base ) {
+        if ( component.componentDidUpdate ) component.componentDidUpdate();
+    } else if ( component.componentDidMount ) {
+        component.componentDidMount();
+    }
+    
+    if ( component.base && component.base.parentNode ) {
+        component.base.parentNode.replaceChild( base, component.base );
+    }
+    
+    component.base = base;
+    base._component = component;
+    
 }
