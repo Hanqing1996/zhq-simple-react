@@ -17,3 +17,8 @@
 在 react 源码中，这个 pragma 的值就是鼎鼎大名的`React.createElement`。
 
 
+#### React.createElement
+返回记录了一个节点信息的 js 对象。这个记录信息的对象我们称之为**虚拟DOM**。
+
+#### render
+用于把虚拟 DOM 挂载到真实节点上。

@@ -1,4 +1,4 @@
-const React = {
+export const React = {
     createElement
 }
 
@@ -14,10 +14,6 @@ const React = {
  * @returns {{children: *[], tag: *, attrs: *}}
  */
 function createElement( tag, attrs, ...children ) {
-    
-    console.log(arguments);
-    
-    
     return {
         tag,
         attrs,
@@ -25,8 +21,3 @@ function createElement( tag, attrs, ...children ) {
     }
 }
 
-export const element = (
-        <div>
-            <h1>Hello, world!</h1>
-        </div>
-    )
