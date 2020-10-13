@@ -56,6 +56,9 @@ function _render( vnode ) {
     const dom = document.createElement(vnode.tag);
     
     if (vnode.attrs) {
+    
+        console.log(vnode.attrs);
+        
         Object.keys(vnode.attrs).forEach(key => {
             
             const value = vnode.attrs[key];
@@ -89,17 +92,15 @@ function render( vnode, container ) {
  */
 function setAttribute( dom, name, value ) {
     
-    
-    console.log('name');
-    console.log(name);
-    
     // 如果属性名是className，则改回class
     if ( name === 'className' ) name = 'class';
     
     // 如果属性名是onXXX，则是一个事件监听方法
     if ( /on\w+/.test( name ) ) {
+        console.log(name);
         name = name.toLowerCase();
         dom[ name ] = value || '';
+        console.log(dom[name]);
         // 如果属性名是style，则更新style对象
     } else if ( name === 'style' ) {
         if ( !value || typeof value === 'string' ) {
@@ -131,15 +132,9 @@ function setAttribute( dom, name, value ) {
 function renderComponent( component ) {
     
     let base;
-
-    console.log(component.render)
     
     // 这里调用的就是类组件的 render 方法，返回一个 jsx 经过 babel 编译的结果
     const renderer = component.render();
-
-    console.log('renderer')
-    console.log(renderer)
-
     
     if (component.base && component.componentWillUpdate ) {
         component.componentWillUpdate();

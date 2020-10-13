@@ -84,3 +84,26 @@ render(){
 注意这个 js 对象是 babel 对 jsx 编译得到的。而把它作为 createElement 参数是我们实现的。
 
 
+#### 绑定事件
+```
+class Welcome extends React.Component {
+    
+    constructor(props) {
+        super(props);
+    }
+    
+    render() {
+        return <h1 onClick={this.clickMe}>Hello, I am a {this.props.name}</h1>;
+    }
+    
+    clickMe(){
+        console.log('click')
+    }
+}
+```
+编译 jsx 代码`<h1 onClick={this.clickMe}>Hello, I am a {this.props.name}</h1>`得到的结果 vnode 
+```
+{
+    attr:{onClick: ƒ}
+}
+```

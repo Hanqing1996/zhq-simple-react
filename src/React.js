@@ -29,14 +29,14 @@ function createComponent( ComponentFunction, props ) {
         // 如果是函数定义组件，则将其扩展为类定义组件
     } else {
     
-        console.log('prototype');
-        console.log(ComponentFunction.prototype);
+        
+        
     
         // inst 是一个 {attrs,children,tag} 的纯 js 对象，它的__proto__是 Object
         inst = new ComponentFunction( props );
     
-        console.log('here');
-        console.log(inst);
+        
+        
     
         /**
          * 这里是硬生生把 constructor 和 render 这两个方法加到了 inst 对象上（注意不是加到原型链上）
@@ -48,7 +48,7 @@ function createComponent( ComponentFunction, props ) {
             return this.constructor( props );
         }
     
-        console.log(inst.render);
+        
     }
     
     return inst;
