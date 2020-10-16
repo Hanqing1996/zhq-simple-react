@@ -93,7 +93,7 @@ class Welcome extends React.Component {
     }
     
     render() {
-        return <h1 onClick={this.clickMe}>Hello, I am a {this.props.name}</h1>;
+        return <h1 onClick={()=>this.clickMe()}>Hello, I am a {this.props.name}</h1>;
     }
     
     clickMe(){
@@ -107,3 +107,24 @@ class Welcome extends React.Component {
     attr:{onClick: ƒ}
 }
 ```
+* 注意下面这种写法是错误的
+> 由于普通函数的 this 是函数调用时才决定的，所以 onClick 中的 this 将会是 DOM节点 h1 而非组件类实例
+```
+    render() {
+        return <h1 onClick={clickMe}>Hello, I am a {this.props.name}</h1>;
+    }
+```
+
+#### state 更新
+1. 触发实例的 setState 方法
+2. 触发 renderComponent 方法，并触发一系列更新操作对应的声明周期函数，比如`componentWillUpdate`, `componentDidUpdate`
+
+
+
+
+
+
+
+
+
+

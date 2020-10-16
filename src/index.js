@@ -6,14 +6,22 @@ class Welcome extends React.Component {
     
     constructor(props) {
         super(props);
+        this.state = {
+            age: 13
+        }
     }
     
     // render 返回内容会在 renderComponent 方法中被解析，生成对应真实 DOM节点。
     render() {
-        return <h1 onClick={this.clickMe}>Hello, I am a {this.props.name}</h1>;
+        return <h1 onClick={()=>this.clickMe()}>Hello, I am a {this.props.name},and I am {this.state.age} years old</h1>;
     }
     
     clickMe(){
+    
+        console.log(this);
+    
+        this.setState( { age:this.state.age+1} );
+        
         console.log('click')
     }
 }

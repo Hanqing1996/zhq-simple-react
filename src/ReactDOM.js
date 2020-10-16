@@ -132,10 +132,15 @@ function setAttribute( dom, name, value ) {
 function renderComponent( component ) {
     
     let base;
+
+    /**
+     * 这里调用的就是类组件的 render 方法，返回一个 jsx 经过 babel 编译的结果
+     * state 更新->触发 renderComponent，也就是说组件类实例的任何一个 state 变化都会导致整个实例重新被生成（其对应 jsx 再次被编译并生成对应DOM节点）
+     */
     
-    // 这里调用的就是类组件的 render 方法，返回一个 jsx 经过 babel 编译的结果
     const renderer = component.render();
     
+    // state 更新就会走到这一步，有 base 说明这次是更新操作，则触发 componentWillUpdate
     if (component.base && component.componentWillUpdate ) {
         component.componentWillUpdate();
     }
