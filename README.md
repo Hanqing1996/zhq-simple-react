@@ -120,6 +120,76 @@ class Welcome extends React.Component {
 2. 触发 renderComponent 方法，并触发一系列更新操作对应的声明周期函数，比如`componentWillUpdate`, `componentDidUpdate`
 
 
+#### 对比真实旧 DOM 和虚拟 DOM，最后返回更新后的DOM
+> 以下表述中,dom 表示旧的 dom 节点;vnode 表示虚拟 DOM,renderNode=document.createElement( vnode.tag ),注意 renderNode 没有子节点，只是简单使用 vnode.tag 构造出的DOM元素
+
+> 总体思想是由上到下，逐级比对，发现不同之处才替换
+* typeof vnode === 'string'
+    * dom 不存在:不做操作，返回 renderNode
+    * dom 存在
+        * dom 类型为文本节点:dom.textContent=vnode，返回 renderNode
+        * dom 类型不为文本节点:dom.parentNode.replace(dom,renderNode)，返回 renderNode
+* typeof vnode !== 'string'
+    * dom 不存在:不做操作，返回 renderNode
+    * dom 存在
+        * dom.nodeName.toLowerCase() === vnode.tag.toLowerCase(): 再深入比对节点属性、子节点情况
+        * dom.nodeName.toLowerCase() !== vnode.tag.toLowerCase(): dom.parentNode.replace(dom,renderNode)，返回 renderNode   
+
+
+
+
+#### 原先的 O(n^3) 的 diff，复杂度是咋计算出来的 
+
+原来的 O(n^3) 的 diff 流程是：
+
+老树的每一个节点都去遍历新树的节点，直到找到新树对应的节点。那么这个流程就是 O(n^2)，再紧接着找到不同之后，再计算最短修改距离然后修改节点，这里是 O(n^3)
+
+
+---
+> 以下内容参考自[React 源码剖析系列 － 不可思议的 react diff](https://zhuanlan.zhihu.com/p/20346379)
+
+#### 为什么节点类型不同时直接替换，不继续往下 diff?
+
+如下图，当 component D 改变为 component G 时，即使这两个 component 结构相似，**一旦 React 判断 D 和 G 是不同类型的组件，就不会比较二者的结构，而是直接删除 component D，重新创建 component G 以及其子节点。**虽然当两个 component 是不同类型但结构相似时，React diff 会影响性能，但正如 React 官方博客所言：不同类型的 component 是很少存在相似 DOM tree 的机会，因此这种极端因素很难在实现开发过程中造成重大影响的。
+
+![](https://pic1.zhimg.com/80/52654992aba15fc90e2dac8b2387d0c4_720w.png)
+
+#### oldPosition<lastIndex 才移动
+
+lastIndex:记录所有访问过的新集合节点，在旧集合中的最右位置
+
+oldPosition:当前访问的新集合节点，在旧集合中的位置
+
+遍历新集合节点，当 oldPosition>=lastIndex 时，旧集合节点无需移动;否则进行位移，到达其在新集合中位置
+
+比如
+
+![0boBjI.jpg](https://s1.ax1x.com/2020/10/16/0boBjI.jpg)
+
+
+但是很容易想到，这种做法，不适用于以下情况
+
+![0bT7QA.jpg](https://s1.ax1x.com/2020/10/16/0bT7QA.jpg)
+
+对此，React 给出了建议
+> 在开发过程中，尽量减少类似将最后一个节点移动到列表首部的操作，当节点数量过大或更新操作过于频繁时，在一定程度上会影响 React 的渲染性能。
+
+#### 如果新集合中有新加入的节点且老集合存在需要删除的节点，那么 React diff 又是如何对比运作的呢？
+* 从新集合中取得 B，判断老集合中存在相同节点 B ...
+
+* **从新集合中取得 E，判断老集合中不存在相同节点 E，则创建新节点 E。**
+
+* 从新集合中取得 C，判断老集合中存在相同节点 C...
+
+* 从新集合中取得 A，判断老集合中存在相同节点 A...
+
+**当完成新集合中所有节点 diff 时，最后还需要对老集合进行循环遍历，判断是否存在新集合中没有但老集合中仍存在的节点，发现存在这样的节点 D，因此删除节点 D，到此 diff 全部完成。**
+
+![](https://pic1.zhimg.com/80/7b9beae0cf0a5bc8c2e82d00c43d1c90_720w.png)
+
+
+
+
 
 
 

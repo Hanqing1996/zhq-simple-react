@@ -85,7 +85,7 @@ function render( vnode, container ) {
 }
 
 /**
- * 递归添加属性
+ * 添加属性，注意没有属性的添加不是递归的，节点的生成才是递归的
  * @param dom
  * @param name
  * @param value
