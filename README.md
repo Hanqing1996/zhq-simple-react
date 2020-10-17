@@ -32,6 +32,9 @@ if (typeof vnode.tag === 'function') {
 }
 ```
 
+> 以下组件的 mount 过程基于未引入 diff 时的代码
+
+
 #### 类组件的 mount 过程
 ```
 class Welcome extends React.Component {
