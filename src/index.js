@@ -18,7 +18,11 @@ class Welcome extends React.Component {
     }
     
     clickMe(){
-        this.setState( { age:this.state.age+1} );
+    
+        this.setState( { age:14} );
+        this.setState( { age:15} );
+        this.setState( { age:16} );
+        this.setState( { age:17} );
     }
 }
 

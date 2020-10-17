@@ -256,3 +256,39 @@ diffNode( component.base, renderer);
 
     * diffNode( component.base, renderer);接下来从上到下逐级分析，一直定位到发生变化的文本节点textNode，更新节点内容
 
+
+---
+## setState
+
+
+在React中，如果是由React引发的事件处理（比如通过onClick引发的事件处理），调用setState不会同步更新this.state，除此之外的setState调用会同步执行this.state 。所谓“除此之外”，指的是绕过React通过addEventListener直接添加的事件处理函数，还有通过setTimeout/setInterval产生的异步调用。
+
+原因： 在React的setState函数实现中，会根据一个变量isBatchingUpdates判断是直接更新this.state还是放到队列中回头再说，而isBatchingUpdates默认是false，也就表示setState会同步更新this.state，但是，有一个函数batchedUpdates，这个函数会把isBatchingUpdates修改为true，而当React在调用事件处理函数之前就会调用这个batchedUpdates，造成的后果，就是由React控制的事件处理过程setState不会同步更新this.state。
+
+注意： setState的“异步”并不是说内部由异步代码实现，其实本身执行的过程和代码都是同步的，只是合成事件和钩子函数的调用顺序在更新之前，导致在合成事件和钩子函数中没法立马拿到更新后的值，形式了所谓的“异步”，当然可以通过第二个参数 setState(partialState, callback) 中的callback拿到更新后的结果。
+
+#### React 中,为什么更新 state 是异步的？
+ 
+在 react 中，更新 state 是异步的，渲染也是异步的，为什么要这样设计呢？为什么不设计成每次setState都会立即更新state（但不会立即渲染）呢，preact 就是这么做的。
+
+[这是 Dan 对此的解释](https://github.com/facebook/react/issues/11527#issuecomment-360199710)。
+
+简单来说，这么设计的一个理由是为了维持内部一致性，即有时候某些 props 依赖于 state,当 state 更新时这些 props 也必须更新。而 props 的更新前提是组件的 render。这种情况下，"每次setState都会立即更新state,但不会立即渲染"是做不到的。
+
+
+#### 连续多个 setState 的作用流程
+假如在某个事件中多次执行 setState
+```js
+clickMe(){
+    this.setState( { age:14} );
+    this.setState( { age:15} );
+    this.setState( { age:16} );
+    this.setState( { age:17} );
+}
+```
+那么 enqueueSetState 会执行四次，但是只有第一次在满足 setStateQueue.length === 0 的条件下，会触发 defer，从而将 flush 放入微任务队列。
+
+在所有 stateChange 都放入 setStateQueue 后，同步代码执行结束。开始执行微任务队列中任务，导致 flush 被执行，从而执行所有状态变更，清空 setStateQueue。
+
+
+
