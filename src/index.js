@@ -1,5 +1,5 @@
-import ReactDOM from './ReactDOM.js'
-import React from './React.js'
+import ReactDOM from './react-dom'
+import React from './react'
 
 // 类组件
 class Welcome extends React.Component {
@@ -17,12 +17,7 @@ class Welcome extends React.Component {
     }
     
     clickMe(){
-    
-        console.log(this);
-    
         this.setState( { age:this.state.age+1} );
-        
-        console.log('click')
     }
 }
 

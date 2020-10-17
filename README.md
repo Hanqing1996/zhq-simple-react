@@ -97,7 +97,7 @@ class Welcome extends React.Component {
     }
     
     clickMe(){
-        console.log('click')
+        
     }
 }
 ```
@@ -138,19 +138,19 @@ class Welcome extends React.Component {
 
 
 
-#### 原先的 O(n^3) 的 diff，复杂度是咋计算出来的 
+#### 原先的 O(n^3) 的 diffOld，复杂度是咋计算出来的 
 
-原来的 O(n^3) 的 diff 流程是：
+原来的 O(n^3) 的 diffOld 流程是：
 
 老树的每一个节点都去遍历新树的节点，直到找到新树对应的节点。那么这个流程就是 O(n^2)，再紧接着找到不同之后，再计算最短修改距离然后修改节点，这里是 O(n^3)
 
 
 ---
-> 以下内容参考自[React 源码剖析系列 － 不可思议的 react diff](https://zhuanlan.zhihu.com/p/20346379)
+> 以下内容参考自[React 源码剖析系列 － 不可思议的 react diffOld](https://zhuanlan.zhihu.com/p/20346379)
 
-#### 为什么节点类型不同时直接替换，不继续往下 diff?
+#### 为什么节点类型不同时直接替换，不继续往下 diffOld?
 
-如下图，当 component D 改变为 component G 时，即使这两个 component 结构相似，**一旦 React 判断 D 和 G 是不同类型的组件，就不会比较二者的结构，而是直接删除 component D，重新创建 component G 以及其子节点。**虽然当两个 component 是不同类型但结构相似时，React diff 会影响性能，但正如 React 官方博客所言：不同类型的 component 是很少存在相似 DOM tree 的机会，因此这种极端因素很难在实现开发过程中造成重大影响的。
+如下图，当 component D 改变为 component G 时，即使这两个 component 结构相似，**一旦 React 判断 D 和 G 是不同类型的组件，就不会比较二者的结构，而是直接删除 component D，重新创建 component G 以及其子节点。**虽然当两个 component 是不同类型但结构相似时，React diffOld 会影响性能，但正如 React 官方博客所言：不同类型的 component 是很少存在相似 DOM tree 的机会，因此这种极端因素很难在实现开发过程中造成重大影响的。
 
 ![](https://pic1.zhimg.com/80/52654992aba15fc90e2dac8b2387d0c4_720w.png)
 
@@ -174,7 +174,7 @@ oldPosition:当前访问的新集合节点，在旧集合中的位置
 对此，React 给出了建议
 > 在开发过程中，尽量减少类似将最后一个节点移动到列表首部的操作，当节点数量过大或更新操作过于频繁时，在一定程度上会影响 React 的渲染性能。
 
-#### 如果新集合中有新加入的节点且老集合存在需要删除的节点，那么 React diff 又是如何对比运作的呢？
+#### 如果新集合中有新加入的节点且老集合存在需要删除的节点，那么 React diffOld 又是如何对比运作的呢？
 * 从新集合中取得 B，判断老集合中存在相同节点 B ...
 
 * **从新集合中取得 E，判断老集合中不存在相同节点 E，则创建新节点 E。**
@@ -183,7 +183,7 @@ oldPosition:当前访问的新集合节点，在旧集合中的位置
 
 * 从新集合中取得 A，判断老集合中存在相同节点 A...
 
-**当完成新集合中所有节点 diff 时，最后还需要对老集合进行循环遍历，判断是否存在新集合中没有但老集合中仍存在的节点，发现存在这样的节点 D，因此删除节点 D，到此 diff 全部完成。**
+**当完成新集合中所有节点 diffOld 时，最后还需要对老集合进行循环遍历，判断是否存在新集合中没有但老集合中仍存在的节点，发现存在这样的节点 D，因此删除节点 D，到此 diffOld 全部完成。**
 
 ![](https://pic1.zhimg.com/80/7b9beae0cf0a5bc8c2e82d00c43d1c90_720w.png)
 
