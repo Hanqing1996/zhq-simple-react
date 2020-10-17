@@ -13,6 +13,7 @@ class Welcome extends React.Component {
     
     // render 返回内容会在 renderComponent 方法中被解析，生成对应真实 DOM节点。
     render() {
+        console.log('Welcome zrender')      
         return <h1 onClick={()=>this.clickMe()}>Hello, I am a {this.props.name},and I am {this.state.age} years old</h1>;
     }
     

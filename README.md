@@ -197,4 +197,59 @@ oldPosition:当前访问的新集合节点，在旧集合中的位置
 
 
 
+#### 组件 Welcome,WelcomeAsFunction 的 mount 过程
+
+ReactDOM.render 为入口
+
+从上到下逐级分析 ReactDOM.render的 render 结果（形如 {tag:div}），再递归地由底层到顶层地不断做两件事 1.生成对应真实DOM节点; 2.挂载到父结点上
+
+注意 vnode（虚拟DOM）不等于组件实例，这是两个概念。vnode 是 jsx 编译成 js 的结果，是内存中用于刻画 DOM 状态的数据结构。vnode 的 tag 可以是"div/h1/text"(表示普通节点),也可以是"function"(表示组件)
+
+* ReactDOM.render
+
+  * diff(undefiend,vnode{tag:div},div#root)
+
+    * diffNode(undefiend,vnode{tag:div})
+      * diffChildren(div(没有子节点，只是按照vnode{tag:div}缔造出了一个类型为div的节点),[{tag:Welcome},{tag:WelcomeAsFunction}])
+        * diffNode(undefined,vchild{tag:Welcome})
+          * diffComponent(undefiend,vchild{tag:Welcome}) 
+            * setComponentProps，调用renderComponent，从而构造vnode对应的DOM节点c.base，再令dom = c.base **,即令dom变成与vchild{tag:Welcome} render内容相对应的 dom 节点（具有子节点）:h1{component:{tag:Welcome}}**
+        * **div(domChildren:[]).appendChild(h1{component:{tag:Welcome}})**		
+        * diffNode(undefined,vchild{tag:WelcomeAsFunction})
+          * diffComponent(undefiend,vchild{tag:WelcomeAsFunction}) 
+            * setComponentProps，调用renderComponent，从而构造vnode对应的DOM节点c.base，再令dom = c.base ,**即令dom变成与vchild{tag:WelcomeAsFunction} render内容相对应的 dom 节点（具有子节点）:h2{component{tag:WelcomeAsFunction}}**
+        * **div(domChildren:[h1{component{tag:Welcome}}]).appendChild(h2{component:{tag:WelcomeAsFunction}})**	
+
+    * ret=div(domChildren:[h1{component{tag:Welcome}},{h2{component:{tag:WelcomeAsFunction}}}]);
+
+      **div#root.appendChild(ret)**
+---
+
+#### 组件 Welcome 的 diff 过程
+
+没有进行除了数据更新节点外，对其它节点的DOM操作
+
+主要思想是:
+1.setSate 会触发内存中组件实例的状态改变
+2.依据更新后的组件实例 component,去获取更新后的 jsx 对应编译结果 renderer(一个 vnode,形如 {tag:h1})
+3.再将 renderer 其与旧的组件对应 DOM 节点 base 做diff:
+```js
+diffNode( component.base, renderer);
+```
+4. 一直追踪到发生变化的DOM节点（比如文本节点），才进行DOM操作，以此保证组件状态更新带来的DOM操作代价最小。
+
+注意更新过程没有触发 ReactDOM.render，DOM 的检查比较起点是发生变化的组件对应的 DOM节点
+
+【吐槽】所以 `_render` 函数压根儿没用到吗。。。
+
+
+* setState，更新 vnode{tag:Welcome}
+
+  * renderComponent(this)
+
+    renderer=状态更新后的组件实例	
+
+    component.base=旧的 vnode{tag:Welcome} 对应DOM节点
+
+    * diffNode( component.base, renderer);接下来从上到下逐级分析，一直定位到发生变化的文本节点textNode，更新节点内容
 

@@ -64,7 +64,18 @@ function _render( vnode,container ) {
     return container.appendChild( dom );
 }
 
+
+/**
+ * @param {*} vnode 
+ * @param {*} container 
+ * @param {*} dom 
+ */
 function render( vnode, container, dom ) {
+    /**
+     * vnode:{tag: 'div', attrs: {…}, children: Array(2), key: null}
+     * container:div#root
+     * dom:undefined
+     */
     return diff( dom, vnode, container );
 }
 

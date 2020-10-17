@@ -11,6 +11,7 @@ export function diff( dom, vnode, container ) {
     return ret;
 }
 
+// 比较旧的 dom 节点和更新后的虚拟节点
 function diffNode( dom, vnode ) {
     
     let out = dom;
@@ -24,6 +25,8 @@ function diffNode( dom, vnode ) {
         
         // 如果当前的DOM就是文本节点，则直接更新内容
         if ( dom && dom.nodeType === 3 ) {    // nodeType: https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeType
+
+            // 文本内容可能没变，不用更新
             if ( dom.textContent !== vnode ) {
                 dom.textContent = vnode;
             }
@@ -65,8 +68,17 @@ function diffNode( dom, vnode ) {
     
 }
 
+/**
+ * 
+ * @param {*} dom :旧DOM元素
+ * @param {*} vchildren ：虚拟节点的子节点数组
+ */
 function diffChildren( dom, vchildren ) {
     
+    /**
+     * 对于旧节点 <h1 >Hello, I am a {this.props.name},and I am {this.state.age} years old</h1>;
+     * domChildren:NodeList=['Hello, I am a','class Component','.and I am ','13',' years old']
+     */
     const domChildren = dom.childNodes;
     const children = [];
     
@@ -216,6 +228,9 @@ export function renderComponent( component ) {
         component.componentWillUpdate();
     }
     
+
+    // component.base:一个 h1 DOM节点
+    // renderer:{tag: 'h1', attrs: {…}, children: Array(5), key: null}
     base = diffNode( component.base, renderer );
     
     component.base = base;
